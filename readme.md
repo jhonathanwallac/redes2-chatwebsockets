@@ -9,7 +9,7 @@
 >
 > 2. Verifique se você possui o Python instalado em sua máquina. Caso não possua, você pode baixá-lo [aqui](https://www.python.org/downloads/);
 >
-> 3. Instale as dependências necessárias presentes no arquivo "requirements.txt", neste projeto foi criado um ambiente virtual usando venv;
+> 3. Instale as dependências necessárias presentes no arquivo "requirements.txt". Neste projeto foi criado um ambiente virtual usando venv, no final deste arquivo readme estará um passo a passo de como criar um ambiente virtual;
 >
 > 4. Execute o arquivo "main.py" através do terminal, pelo Pycharm ou Visual Studio Code para inicializar o servidor;
 >
@@ -24,3 +24,40 @@
 > <br> Cole isto na aba de extensões do Visual Studio Code: ritwickdey.LiveServer
 
 > ### Acesse o vídeo de explicação do código clicando [aqui](https://drive.google.com/);
+
+
+> <strong> CRIAÇÃO AMBIENTE VIRTUAL: </strong>
+>
+> Passo 1 - Criar um diretório:
+> <br> mkdir redes2chatwebsockets
+>
+> Passo 2 - Entrar no diretório:
+> <br> cd redes2chatwebsockets
+> <br> *Obs: Verifique se está no diretório correto usando o comando "pwd"
+>
+> Passo 3 - Instalar o ambiente virtual:
+> a. Instalação do pacote
+> <br> sudo apt install python3.12 -venv
+> <br> *Obs: Pode ser que solicite que você execute o comando "sudo apt-get update"
+>
+> b. Criação do Ambiente Virtual
+> <br> python3 -m venv env
+>
+> Passo 4 - Ativar o ambiente virtual:
+> <br> source env/bin/activate
+>
+> Passo 5 - Instalação das dependências:
+> <br> pip3 install websockets
+> <br> pip3 install asyncio
+>
+> Passo 6 - Listar os pacotes instalados:
+> <br> pip3 list
+>
+> Passo 7 - Mostra os pacotes e a versão para inserir no arquivo requirements.txt
+> <br> pip3 freeze
+>
+> Passo 8 - Criação do arquivo requirements:
+> <br> pip3 freeze > requirements.txt
+>
+> Passo 9 - Listar o arquivo requirements.txt:
+> <br> cat requirements.txt
