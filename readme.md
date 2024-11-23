@@ -9,7 +9,7 @@
 >
 > 2. Verifique se você possui o Python instalado em sua máquina. Caso não possua, você pode baixá-lo [aqui](https://www.python.org/downloads/);
 >
-> 3. Instale as dependências necessárias presentes no arquivo "requirements.txt";
+> 3. Instale as dependências necessárias presentes no arquivo "requirements.txt", neste projeto foi criado um ambiente virtual usando venv;
 >
 > 4. Execute o arquivo "main.py" através do terminal, pelo Pycharm ou Visual Studio Code para inicializar o servidor;
 >
