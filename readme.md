@@ -281,3 +281,187 @@ b) Dentro do seu arquivo "index.html" cole o código a seguir:
 ✅ Se você seguiu corretamente os passos anteriores, já pode testar o seu chat! Abra mais de uma vez o arquivo "index.html" através de um dos procedimentos acima para simular um chat com dois ou mais usuários!
 
 <strong> E como prometido, logo abaixo está explicação dos códigos!</strong>
+
+> ### Não há necessidade de prolongar a explicação com a estilização e estrutura do html que compõe a interface do chat. Portanto, explicaremos apenas o código em Python e o Javascript, que é responsável pela integração desta interface com a aplicação websocket feita em Python.
+
+## EXPLICAÇÃO CÓDIGO PYTHON:
+
+```python
+import asyncio
+import websockets
+import json
+```
+- Importações: Aqui, estamos importando as bibliotecas necessárias. asyncio é uma biblioteca que fornece suporte para programação assíncrona. websockets é uma biblioteca que facilita a implementação de servidores e clientes WebSocket. json é usado para codificar e decodificar dados em formato JSON.
+
+```python
+connected_clients = set()
+```
+- Conexões ativas: Criamos um conjunto chamado connected_clients para armazenar as conexões WebSocket ativas. Usamos um conjunto porque ele não permite duplicatas e facilita a adição e remoção de conexões.
+
+```python
+async def chat_handler(websocket):
+```
+- Função de manipulação de chat: Definimos uma função assíncrona chamada chat_handler, que será chamada sempre que um novo cliente se conectar. O parâmetro websocket representa a conexão do cliente.
+
+```python
+connected_clients.add(websocket)
+```
+- Adicionar cliente: Quando um cliente se conecta, adicionamos sua conexão ao conjunto connected_clients.
+
+```python
+try:
+    async for message in websocket:
+```
+- Loop de mensagens: Usamos um bloco try para lidar com exceções. O loop async for permite que o servidor escute continuamente por mensagens enviadas pelo cliente através da conexão WebSocket.
+
+```python
+data = json.loads(message)
+```
+- Decodificação da mensagem: Quando uma mensagem é recebida, ela é decodificada de JSON para um dicionário Python usando json.loads.
+
+```python
+username = data.get("username")
+msg = data.get("message")
+```
+- Extraindo dados: Extraímos o nome de usuário e a mensagem do dicionário data usando o método get, que retorna None se a chave não existir.
+
+```python
+payload = json.dumps({"username": username, "message": msg})
+```
+- Preparando a mensagem para envio: Criamos um novo dicionário com o nome de usuário e a mensagem e o convertemos de volta para uma string JSON usando json.dumps.
+
+```python
+await asyncio.gather(*[client.send(payload) for client in connected_clients if client != websocket])
+```
+- Envio de mensagens: Usamos asyncio.gather para enviar a mensagem a todos os clientes conectados, exceto o que enviou a mensagem original. A list comprehension cria uma lista de tarefas de envio.
+
+```python
+except websockets.exceptions.ConnectionClosed:
+    print("Cliente desconectado.")
+```
+- Tratamento de desconexão: Se um cliente se desconectar, uma exceção ConnectionClosed é levantada. Nesse caso, imprimimos uma mensagem no console.
+
+```python
+finally:
+    connected_clients.remove(websocket)
+```
+- Remoção do cliente: No bloco finally, garantimos que a conexão do cliente seja removida do conjunto connected_clients, independentemente de como o bloco try termina (seja normalmente ou por exceção).
+
+```python
+async def main():
+```
+- Função principal: Definimos uma função assíncrona main que será responsável por iniciar o servidor WebSocket.
+
+```python
+async with websockets.serve(chat_handler, "localhost", 5000):
+```
+- Início do servidor: Usamos websockets.serve para iniciar o servidor WebSocket, associando a função chat_handler a novas conexões. O servidor será executado em localhost na porta 5000.
+
+```python
+print("Servidor WebSocket iniciado na porta 5000")
+```
+- Mensagem de inicialização: Imprimimos uma mensagem no console para indicar que o servidor foi iniciado.
+
+```python
+await asyncio.Future()
+```
+- Manter o servidor ativo: Usamos await asyncio.Future() para manter o servidor em execução indefinidamente. Isso cria uma tarefa que nunca é concluída, mantendo o loop de eventos ativo.
+
+```python
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+- Execução do servidor: Este bloco verifica se o script está sendo executado diretamente. Se for o caso, ele chama a função main() usando asyncio.run, que inicia o loop de eventos e executa a função assíncrona main, iniciando assim o servidor WebSocket.
+
+
+## EXPLICAÇÃO CÓDIGO JAVASCRIPT:
+
+```javascript
+const messagesDiv = document.getElementById('messages');
+const messageForm = document.getElementById('message-form');
+const usernameInput = document.getElementById('username');
+const messageInput = document.getElementById('message-input');
+```
+- Referências aos elementos do DOM: Aqui, estamos selecionando elementos do DOM (Document Object Model) usando document.getElementById e armazenando suas referências em variáveis:
+
+```javascript
+const socket = new WebSocket('ws://localhost:5000');
+```
+- Criação de uma conexão WebSocket: Estamos criando uma nova conexão WebSocket com o servidor que está rodando em localhost na porta 5000. A variável socket representa essa conexão.
+
+```javascript
+socket.onopen = () => {
+    console.log('Conexão com WebSocket estabelecida!');
+};
+```
+- Evento de conexão aberta: Aqui, estamos definindo um manipulador de eventos que será chamado quando a conexão WebSocket for estabelecida com sucesso. Neste caso, estamos apenas registrando uma mensagem no console.
+
+```javascript
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', 'received');
+    messageElement.textContent = `${data.username}: ${data.message}`;
+    messagesDiv.appendChild(messageElement);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+};
+```
+- Evento de mensagem recebida: Este bloco de código é um manipulador de eventos que será chamado sempre que uma mensagem for recebida do servidor:
+event.data: Contém a mensagem recebida.
+JSON.parse(event.data): Decodifica a mensagem JSON para um objeto JavaScript.
+document.createElement('div'): Cria um novo elemento div para exibir a mensagem.
+messageElement.classList.add('message', 'received'): Adiciona classes CSS ao novo elemento para estilização.
+messageElement.textContent = ${data.username}: ${data.message}``: Define o conteúdo de texto do elemento como o nome de usuário e a mensagem recebida.
+messagesDiv.appendChild(messageElement): Adiciona o novo elemento de mensagem à messagesDiv.
+messagesDiv.scrollTop = messagesDiv.scrollHeight: Rolagem automática para a parte inferior da div de mensagens, garantindo que a mensagem mais recente esteja visível.
+
+```javascript
+messageForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+```
+- Evento de envio do formulário: Aqui, estamos adicionando um manipulador de eventos ao formulário que será chamado quando ele for enviado:
+e.preventDefault(): Impede o comportamento padrão do formulário, que seria recarregar a página.
+
+```javascript
+const username = usernameInput.value;
+const message = messageInput.value;
+```
+- Captura de valores do formulário: Estamos capturando o nome de usuário e a mensagem digitados pelo usuário nos campos de entrada.
+
+```javascript
+if (message.trim()) {
+```
+- Verificação de mensagem não vazia: Verificamos se a mensagem não está vazia após remover espaços em branco no início e no final com trim().
+
+```javascript
+const messageData = {
+    username: username,
+    message: message
+};
+```
+- Criação do objeto de mensagem: Criamos um objeto messageData que contém o nome de usuário e a mensagem.
+
+```javascript
+socket.send(JSON.stringify(messageData));
+```
+- Envio da mensagem: Convertendo o objeto messageData em uma string JSON e enviando-o através da conexão WebSocket.
+
+```javascript
+const sentMessage = document.createElement('div');
+sentMessage.classList.add('message', 'sent');
+sentMessage.textContent = `${username}: ${message}`;
+messagesDiv.appendChild(sentMessage);
+messagesDiv.scrollTop = messagesDiv.scrollHeight;
+```
+- Exibição da mensagem enviada: Criamos um novo elemento div para a mensagem enviada pelo usuário:
+sentMessage.classList.add('message', 'sent '): Adiciona classes CSS ao novo elemento para estilização.
+sentMessage.textContent = ${username}: ${message}``: Define o conteúdo de texto do elemento como o nome de usuário e a mensagem enviada.
+messagesDiv.appendChild(sentMessage): Adiciona o novo elemento de mensagem à messagesDiv.
+messagesDiv.scrollTop = messagesDiv.scrollHeight: Rolagem automática para a parte inferior da div de mensagens, garantindo que a mensagem mais recente esteja visível.
+
+```javascript
+        messageInput.value = '';
+    }
+});
+```
+- Limpeza do campo de entrada: Após enviar a mensagem, o campo de entrada messageInput é limpo, definindo seu valor como uma string vazia, para que o usuário possa digitar uma nova mensagem. O bloco if garante que o código dentro dele só seja executado se a mensagem não estiver vazia.
