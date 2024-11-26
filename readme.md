@@ -11,6 +11,8 @@ Começaremos com um pequeno passo a passo de como podemos criar um ambiente virt
 
 <strong> Observação: Verifique se você possui o Python instalado em sua máquina. Caso não possua, você pode baixá-lo [aqui](https://www.python.org/downloads/).</strong>
 
+> Este tutorial considera o desenvolvimento em <strong>sistema operacional Linux(Ubuntu)</strong>.
+
 
 <strong>Criação do ambiente virtual</strong>
 
@@ -465,3 +467,6 @@ messagesDiv.scrollTop = messagesDiv.scrollHeight: Rolagem automática para a par
 });
 ```
 - Limpeza do campo de entrada: Após enviar a mensagem, o campo de entrada messageInput é limpo, definindo seu valor como uma string vazia, para que o usuário possa digitar uma nova mensagem. O bloco if garante que o código dentro dele só seja executado se a mensagem não estiver vazia.
+
+
+### É isso, obrigado por ler até aqui!
